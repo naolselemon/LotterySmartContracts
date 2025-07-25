@@ -69,4 +69,46 @@ describe('Lottery Contract', () => {
             assert(err);
         }
     })
+
+    it('minimun amount of ether to win the lottery', async() => {
+      
+            await lottery.methods.enter().send({
+                from: accounts[0],
+                value: web3.utils.toWei('1', 'ether')
+            })
+
+            const initialBalance = await web3.eth.getBalance(accounts[0]);
+
+            await lottery.methods.pickWinner().send({
+                from: accounts[0]
+            })
+
+            const finalBalance = await web3.eth.getBalance(accounts[0]);
+            const difference = finalBalance - initialBalance;
+            assert(difference > web3.utils.toWei('0.8', 'ether'));
+
+        
+    })
+
+    it('resets the players array and amount of the ether in the lottery after picking a winner', async () => {
+        await lottery.methods.enter().send({
+            from: accounts[0],
+            value: web3.utils.toWei('1', 'ether')
+        })
+
+        await lottery.methods.pickWinner().send({
+            from: accounts[0]
+        })
+
+        const players = await lottery.methods.getPlayers().call();
+        assert.strictEqual(0, players.length);
+
+        // Check that the balance of the lottery is 0 after picking a winner
+        const balance = await web3.eth.getBalance(lottery.options.address);
+        // The balance should be 0 after picking a winner
+        
+        assert.strictEqual("0", balance);
+    
+    })
+
 })
