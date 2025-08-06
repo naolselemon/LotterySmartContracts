@@ -4,6 +4,12 @@ const Web3 = require("web3");
 const { interface, bytecode } = require("./compile");
 require('dotenv').config();
 
+// console.log('interface', interface);
+
+if (!process.env.MNEMONIC || !process.env.INFURA) {
+    throw new Error("Please set MNEMONIC and INFURA environment variables");
+}
+
 const provider = new HDWalletProvider(process.env.MNEMONIC, process.env.INFURA);
 const web3 = new Web3(provider);
 
